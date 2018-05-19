@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask import request, json
 from github_functions import label_opened_issue
-from stemming.porter2 import stem
+from stemming.porter2 import stemmer
 from nltk.tokenize import word_tokenize
 
 app = Flask(__name__)
@@ -11,7 +11,7 @@ app = Flask(__name__)
 def home():
     return 'Response to test hosting.'
 
-#this function will recieve all the github events
+#This function will recieve all the github events
 @app.route('/web_hook', methods=['POST'])
 def github_hook_receiver_function():
     if request.headers['Content-Type'] == 'application/json':
@@ -29,11 +29,9 @@ def github_hook_receiver_function():
 
 
 def get_stems(sentence):
-    result = list()
-    tokens = word_tokenize(sentence)
-    for word in tokens:
-        result.append(stem(word))
-    return result
+    #Generator expressions with joins are much faster than conversion to strings and appending to stemmed tokens to lists and overheads of string conversion.
+    stemmed_sentence = ' '.join(stemmer.stem(token) for token in word_tokenize(sentence))
+    return stemmed_sentence
 
 if __name__ == '__main__':
     app.run()
