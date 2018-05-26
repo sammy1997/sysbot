@@ -18,4 +18,5 @@ MESSAGE = {
     'correct_approve_format': 'The correct format is /sysbot_approve_issue <repo> <issue_no>',
     'error_slash_command': 'The slash command got a 500 error. Please check and try again.',
     'not_a_maintainer': 'You are not a maintainer. Please contact <@U0BKKUBQU|may> to get added.'
+    'correct_assign_format': 'The correct format is /sysbot_assign_issue <repo_name> <issue_no> <assignee_github_username>',
 }
