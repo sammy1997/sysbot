@@ -12,5 +12,10 @@ MESSAGE = {
         '\nTo give any thanks or recognition to other members, shoutout in the #celebrate channel.'
         '\n\nHow to operate Sysbot?'+\
         '\nType /sysbot_help',
-    'newcomer_requirement_incomplete': 'Please complete the newcomers requirements! Visit http://systers.io/member-levels for more info.'
+    'newcomer_requirement_incomplete': 'Please complete the newcomers requirements! Visit http://systers.io/member-levels for more info.',
+    'wrong_info': 'Wrong info provided',
+    'success': 'Success',
+    'correct_approve_format': 'The correct format is /sysbot_approve_issue <repo> <issue_no>',
+    'error_slash_command': 'The slash command got a 500 error. Please check and try again.',
+    'not_a_maintainer': 'You are not a maintainer. Please contact <@U0BKKUBQU|may> to get added.'
 }
