@@ -34,15 +34,21 @@ def github_hook_receiver_function():
                 tokens = comment_body.split(' ')
                 commenter = data.get('comment', {}).get('user', {}).get('login', '')
                 is_issue_claimed_or_assigned = check_multiple_issue_claim(repo_owner, repo_name, issue_number)
+                author_association = data.get('comment', {}).get('author_association', '')
+                is_approval_comment = check_comment_approve_stems(comment_body)
 
                 #Check if the comment by coveralls
                 if commenter == 'coveralls' and 'Coverage decreased' in comment_body:
                     github_comment(MESSAGE.get('add_tests', ''), repo_owner, repo_name, issue_number)
 
                 #If comment is for approving issue
-                if comment_body.lower() == '@sys-bot approve':
-                    issue_comment_approve_github(issue_number, repo_name, repo_owner)
-                    return jsonify(request.json)
+                if ('@sys-bot approve' in comment_body.lower()  or is_approval_comment):
+                    if (author_association == 'COLLABORATOR' or author_association == 'OWNER'):
+                        issue_comment_approve_github(issue_number, repo_name, repo_owner)
+                        return jsonify(request.json)
+                    elif (author_association != 'COLLABORATOR' and author_association != 'OWNER'):
+                        github_comment(MESSAGE.get('no_write_access', ''), repo_owner, repo_name, issue_number)
+                        return jsonify(request.json)
 
                 #If comment is to assign issue
                 if comment_body.lower().startswith('@sys-bot assign'):
@@ -141,6 +147,22 @@ def lemmatize_sent(sentence):
     #Generator expressions with joins are much faster than conversion to strings and appending to stemmed tokens to lists and overheads of string conversion.
     lemmatized_sentence = ' '.join(WordNetLemmatizer().lemmatize(token) for token in word_tokenize(sentence))
     return lemmatized_sentence
+
+
+def check_comment_approve_stems(sentence):
+    is_approval_comment = False
+    nltk.download('wordnet')
+    #Get stems of the words in the sentence
+    stems = get_stems(sentence.lower())
+    lemmatized_sentence = lemmatize_sent(sentence.lower())
+    #Some variants of approve word
+    list_of_probable_variants = ['approve','approved','approving','approval']
+    for word in list_of_probable_variants:
+        if 'issue' in sentence and (get_stems(word) in stems or lemmatize_sent(word) in lemmatized_sentence):
+            is_approval_comment= True
+            break
+    return is_approval_comment
+
 
 if __name__ == '__main__':
     app.run()
