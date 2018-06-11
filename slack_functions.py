@@ -65,7 +65,6 @@ def approve_issue_label_slack(data):
                 params = data.get('text','')
                 if params != '' and len(params.split(' ')) == 2:
                     issue_author = get_issue_author(org_repo_owner, params.split(' ')[0], params.split(' ')[1])
-                    print(issue_author, github_id)
                     if issue_author == github_id:
                         send_message_ephimeral(channel_id, uid, MESSAGE.get('author_cannot_approve',''))
                         return
@@ -208,8 +207,7 @@ def open_issue_slack(data):
 
 def get_detailed_profile(uid):
     body = {'user': uid, 'include_labels': True}
-    get_profile_response = requests.post(get_user_profile_info_url, data=body, headers=headers_legacy_urlencoded)
-    profile_response_json = get_profile_response.json()
+    profile_response_json = requests.post(get_user_profile_info_url, data=body, headers=headers_legacy_urlencoded).json()
     if profile_response_json.get('ok', False):
         profile = profile_response_json.get('profile', {})
         return {'profile': profile, 'ok': True}
@@ -218,12 +216,10 @@ def get_detailed_profile(uid):
 
 def get_github_username_profile(profile):
         custom_fields = profile.get('fields', {})
-        github_profile_present = False
         github_id = ""
         for key in custom_fields:
             github_link = custom_fields.get(key, {}).get('value', '')
             if 'github.com/' in github_link:
-                github_profile_present = True
                 github_id = github_link.split('github.com/')[1]
-                return {'github_profile_present': github_profile_present, 'github_id': github_id}
+                return {'github_profile_present': True, 'github_id': github_id}
         return {'github_profile_present': False}
